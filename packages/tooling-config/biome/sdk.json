@@ -1,0 +1,33 @@
+{
+  "root": false,
+  "$schema": "https://biomejs.dev/schemas/2.4.8/schema.json",
+  "extends": ["./base.json"],
+  "overrides": [
+    {
+      "includes": ["**/core-exporter.ts", "**/galbi-gltf-exporter.ts", "**/galbi-stl-exporter.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off",
+            "noDoubleEquals": "off",
+            "noVar": "off",
+            "noImplicitAnyLet": "off"
+          },
+          "correctness": {
+            "noInnerDeclarations": "off",
+            "noUnusedVariables": "off",
+            "noUnusedFunctionParameters": "off"
+          },
+          "complexity": {
+            "useOptionalChain": "off",
+            "noUselessConstructor": "off"
+          },
+          "style": {
+            "useTemplate": "off",
+            "noNonNullAssertion": "off"
+          }
+        }
+      }
+    }
+  ]
+}

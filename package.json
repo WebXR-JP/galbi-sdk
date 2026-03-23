@@ -1,0 +1,25 @@
+{
+  "name": "galbi",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "db:setup:local": "pnpm --filter @repo/database db:migrate:local",
+    "dev": "turbo run dev",
+    "deploy": "turbo run deploy",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "check": "turbo run check",
+    "postinstall": "node scripts/postinstall.cjs",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "turbo": "catalog:"
+  },
+  "packageManager": "pnpm@9.15.1"
+}

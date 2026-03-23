@@ -1,0 +1,11 @@
+{
+  "root": false,
+  "$schema": "https://biomejs.dev/schemas/2.4.8/schema.json",
+  "extends": ["./base.json"],
+  "linter": {
+    "includes": ["**/src/**/*.ts", "**/src/**/*.tsx"]
+  },
+  "formatter": {
+    "includes": ["**/src/**/*.ts", "**/src/**/*.tsx"]
+  }
+}
