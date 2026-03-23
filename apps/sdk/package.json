@@ -1,0 +1,53 @@
+{
+  "name": "@repo/sdk",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/galbi.umd.js",
+  "module": "./dist/galbi.es.mjs",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/galbi.es.mjs",
+      "require": "./dist/galbi.umd.js"
+    },
+    "./styles.css": "./dist/galbi.css"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && pnpm build:playcanvas",
+    "build:playcanvas": "node scripts/prepare-playcanvas.js",
+    "preview": "vite preview",
+    "check": "biome check --config-path ../../packages/tooling-config/biome/sdk.json --write .",
+    "lint": "biome lint --config-path ../../packages/tooling-config/biome/sdk.json --write .",
+    "format": "biome format --config-path ../../packages/tooling-config/biome/sdk.json --write ."
+  },
+  "dependencies": {
+    "@repo/api": "workspace:*",
+    "@trpc/client": "catalog:",
+    "@trpc/react-query": "catalog:",
+    "@trpc/server": "catalog:",
+    "playcanvas": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:biome",
+    "@repo/tooling-config": "workspace:*",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^6.0.1",
+    "cross-env": "^7.0.3",
+    "rimraf": "^6.0.1",
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0"
+  }
+}

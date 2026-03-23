@@ -1,0 +1,25 @@
+{
+  "name": "@repo/docs",
+  "version": "1.0.0",
+  "description": "Documentation for Galbi SDK",
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev --port 5175",
+    "build": "vitepress build",
+    "preview": "vitepress preview --port 5175",
+    "deploy": "pnpm run build && wrangler pages deploy .vitepress/dist --project-name=galbi-sdk-docs --commit-dirty=true",
+    "check": "biome check --config-path ../../packages/tooling-config/biome/src-only.json --write .",
+    "lint": "biome lint --config-path ../../packages/tooling-config/biome/src-only.json --write .",
+    "format": "biome format --config-path ../../packages/tooling-config/biome/src-only.json --write ."
+  },
+  "dependencies": {
+    "vue": "^3.3.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "catalog:biome",
+    "vitepress": "^1.0.0",
+    "@types/node": "^20.0.0",
+    "typescript": "catalog:",
+    "wrangler": "4.76.0"
+  }
+}

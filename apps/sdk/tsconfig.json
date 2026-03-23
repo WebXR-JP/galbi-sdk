@@ -1,0 +1,10 @@
+{
+  "extends": "@repo/tooling-config/typescript/vite-react.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationDir": "./dist/types",
+    "outDir": "./dist"
+  },
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
