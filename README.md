@@ -1,100 +1,109 @@
-# Galbi SDK Monorepo
+# Galbi SDK
 
-WebXR・3D コンテンツ向けのリアルタイムチャット＆インタラクション SDK。
+Real-time 3D model synchronization SDK for WebXR, VRChat, and collaborative 3D workflows.
 
-## プロジェクト構成
+Galbi lets you instantly share 3D scenes from PlayCanvas or Blender via a simple URL — no login required.
+
+## Features
+
+- **Instant Sharing** — Generate a public URL for any 3D scene in one click
+- **Real-time Sync** — Auto-sync changes at configurable intervals (5s / 10s / 30s / 1m)
+- **Multi-platform** — Works in PlayCanvas (Web SDK) and Blender (Addon)
+- **VRChat Ready** — View shared models directly in VRChat viewer worlds
+- **Export Formats** — GLB, GLTF, and STL export support
+- **No Auth Required** — Anonymous model creation with 24-hour expiration
+- **Multi-language** — UI supports Japanese, English, and Korean
+
+## Architecture
 
 ```text
 apps/
-  sdk/                Web SDK（Vite ライブラリビルド・React・PlayCanvas）
-  docs/               ドキュメント（VitePress）
+  sdk/              Web SDK (Vite library build, React, PlayCanvas)
+  docs/             Documentation site (VitePress)
+  blender-addon/    Blender addon for 3D model sync
 
 packages/
-  api/                API（Cloudflare Workers + Hono + tRPC）
-  database/           DB レイヤー（Cloudflare D1 + Prisma 7）
-  typescript-config/  共有 TypeScript 設定
+  api/              API server (Cloudflare Workers + Hono + tRPC)
+  database/         Data layer (Cloudflare D1 + Prisma)
+  tooling-config/   Shared Biome & TypeScript configs
 ```
 
-## 前提条件
+## Prerequisites
 
-- [Node.js](https://nodejs.org/) v18 以上
-- [pnpm](https://pnpm.io/) v9 以上
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/) v4 以上
+- [Node.js](https://nodejs.org/) v18+
+- [pnpm](https://pnpm.io/) v9+
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/) v4+
 
-## セットアップ
+## Getting Started
 
 ```bash
+# Install dependencies (also initializes local D1 database)
 pnpm install
+
+# Start all services
+pnpm dev
 ```
 
-`pnpm install` の完了時に `wrangler d1 migrations apply --local` が自動実行され、ローカル D1 の初期化まで行います。
-
-DB スキーマの定義源は `packages/database/prisma/schema.prisma` です。
-Wrangler 用 SQL は次で再生成できます:
-
-```bash
-pnpm -F @repo/database db:migrate:from-schema
-```
-
-スキップする場合:
+The `postinstall` script automatically runs `wrangler d1 migrations apply --local` to set up the local database. To skip this:
 
 ```bash
 SKIP_LOCAL_D1_SETUP=1 pnpm install
 ```
 
-### 環境変数
+### Environment Variables
 
 ```bash
 cp packages/api/.dev.vars.example packages/api/.dev.vars
 cp apps/sdk/.env.example apps/sdk/.env.local
 ```
 
-`.dev.vars` を編集し、OIDC 関連の値を設定してください。
+Edit `.dev.vars` to configure OIDC settings as needed.
 
-## 開発
+## Development
 
 ```bash
 pnpm dev
 ```
 
-各サービスが以下のポートで起動します:
+| Service  | Port | Description            |
+|----------|------|------------------------|
+| Database | 3002 | D1 Worker (Prisma)     |
+| API      | 3001 | Hono + tRPC            |
+| SDK      | 5174 | Vite dev server        |
+| Docs     | 5175 | VitePress              |
 
-| サービス | ポート | 説明 |
-|----------|--------|------|
-| Database | 3002 | D1 Worker（Prisma） |
-| API | 3001 | Hono + tRPC |
-| SDK | 5174 | Vite 開発サーバー |
-| Docs | 5175 | VitePress |
-
-## ビルド
+## Build
 
 ```bash
-pnpm build         # 全パッケージビルド
-pnpm check         # biome check（format + lint）
-pnpm test          # テスト実行
+pnpm build       # Build all packages
+pnpm check       # Biome check (format + lint)
+pnpm test        # Run tests
 ```
 
-### SDK ビルド出力
+### SDK Build Output
 
-`pnpm -F @repo/sdk build` で以下が生成されます:
-
-```text
-apps/sdk/dist/
-  galbi.es.mjs      ESM（バンドラー・モダン環境向け）
-  galbi.umd.js      UMD（CommonJS・グローバル変数向け）
-  galbi.css          スタイルシート（Tailwind CSS）
-  types/Galbi.d.ts   TypeScript 型定義
+```bash
+pnpm -F @repo/sdk build
 ```
 
-### PlayCanvas 向けビルド
+Produces:
+
+| File               | Format | Use Case                        |
+|--------------------|--------|---------------------------------|
+| `galbi.es.mjs`     | ESM    | Bundlers & modern environments  |
+| `galbi.umd.js`     | UMD    | CommonJS & global variable      |
+| `galbi.css`        | CSS    | Tailwind CSS stylesheet         |
+| `types/index.d.ts` | DTS    | TypeScript type definitions     |
+
+### PlayCanvas Build
 
 ```bash
 pnpm -F @repo/sdk build:playcanvas
 ```
 
-`dist/playcanvas/galbi.mjs` が生成されます。PlayCanvas エディタにアップロードして使用できます。
+Generates `dist/playcanvas/galbi.mjs` for use in the PlayCanvas Editor.
 
-## ワークスペース別コマンド
+## Workspace Commands
 
 ```bash
 # API
@@ -119,6 +128,32 @@ pnpm -F @repo/database db:migrate:local
 pnpm -F @repo/database db:migrate:remote
 ```
 
-## ライセンス
+## How It Works
+
+1. **Generate URL** — Creates an anonymous model entry on the server with a unique public URL
+2. **Sync** — Exports the 3D scene as GLB and uploads it to R2 storage
+3. **Share** — Anyone with the URL can view the model in a browser or VRChat
+4. **Auto-sync** — Optionally polls for changes and re-uploads at a set interval
+
+## Tech Stack
+
+| Layer     | Technology                          |
+|-----------|-------------------------------------|
+| SDK       | React, PlayCanvas, Vite, tRPC      |
+| API       | Hono, tRPC, Zod, Cloudflare Workers|
+| Database  | Prisma, Cloudflare D1 (SQLite)     |
+| Storage   | Cloudflare R2                       |
+| Docs      | VitePress                           |
+| Tooling   | Turbo, pnpm, Biome, Husky          |
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
 
 [MIT](./LICENSE)

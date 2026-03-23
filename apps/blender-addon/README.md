@@ -1,147 +1,125 @@
 # Galbi Blender Addon
 
-[Galbi SDK](https://github.com/yushimatenjin/galbi-sdk) の Blender アドオンです。Blender 上の 3D モデルを GLB 形式でエクスポートし、Galbi サーバーへ同期して共有 URL を発行します。生成された URL から Web ブラウザや VRChat ワールドでモデルを確認できます。
+Blender addon for exporting 3D models to [Galbi SDK](https://github.com/yushimatenjin/galbi-sdk) servers. Export your models as GLB, sync them to a shareable URL, and view them in a web browser or VRChat — all from within Blender.
 
-外部 Python パッケージへの依存はなく、Blender 同梱の標準ライブラリのみで動作します。
+Zero external Python dependencies. Uses only Blender's bundled standard library.
 
-## 動作環境
+## Requirements
 
-| 項目 | バージョン |
-|------|-----------|
-| Blender | 3.6 以降 |
-| Python | Blender 同梱版（外部パッケージ不要） |
+| Item    | Version                                    |
+|---------|--------------------------------------------|
+| Blender | 3.6+ (tested on 4.x and 5.x)              |
+| Python  | Blender-bundled (no external packages)      |
 
-> Blender 4.x / 5.x で動作確認済み
+## Installation
 
-## インストール
+### From zip (recommended)
 
-### zip からインストール（推奨）
+1. Download `galbi_addon.zip` from [Releases](https://github.com/yushimatenjin/galbi-sdk/releases), or [build it yourself](#build)
+2. Open Blender → **Edit → Preferences → Add-ons**
+3. Click **Install from File** → select `galbi_addon.zip`
+4. Enable the **Galbi** addon
 
-1. [Releases](https://github.com/yushimatenjin/galbi-sdk/releases) から `galbi_addon.zip` をダウンロード、
-   または [ビルド](#ビルド) で生成
-2. Blender を起動 → **Edit → Preferences → Add-ons**
-3. **Install from File** → `galbi_addon.zip` を選択
-4. **Galbi** にチェックを入れて有効化
+### Manual
 
-### 手動インストール
+Copy the `galbi_addon/` directory to your Blender addons folder:
 
-`galbi_addon/` ディレクトリを Blender のアドオンフォルダにコピーします。
-
-| OS | パス |
-|----|------|
+| OS      | Path                                                              |
+|---------|-------------------------------------------------------------------|
 | Windows | `%APPDATA%\Blender Foundation\Blender\<version>\scripts\addons\` |
-| macOS | `~/Library/Application Support/Blender/<version>/scripts/addons/` |
-| Linux | `~/.config/blender/<version>/scripts/addons/` |
+| macOS   | `~/Library/Application Support/Blender/<version>/scripts/addons/` |
+| Linux   | `~/.config/blender/<version>/scripts/addons/`                     |
 
-コピー後、Blender を再起動して Preferences → Add-ons で **Galbi** を有効化してください。
+Restart Blender and enable **Galbi** in Preferences → Add-ons.
 
-## 使い方
+## Usage
 
-### パネルを開く
+### Open the Panel
 
-3D Viewport で `N` キーを押してサイドバーを表示し、**Galbi** タブを選択します。
+Press `N` in the 3D Viewport to open the sidebar, then select the **Galbi** tab.
 
-### サーバーを選択する
+### Select a Server
 
-パネル上部のトグルボタンで接続先を切り替えます。
+Toggle the server at the top of the panel:
 
-| ボタン | 接続先 |
-|--------|--------|
-| **galbi.yutt.net** | Galbi 公開サーバー（デフォルト） |
-| **ローカル** | 自分で立てたローカルサーバー（URL を自由に設定可能） |
+| Button              | Target                                |
+|---------------------|---------------------------------------|
+| **galbi.yutt.net**  | Public Galbi server (default)         |
+| **Local**           | Your local dev server (configurable)  |
 
-ローカルサーバーの起動方法はリポジトリルートの [README](https://github.com/yushimatenjin/galbi-sdk#readme) を参照してください。
+### Export Settings
 
-### エクスポート設定
+| Setting               | Description                                       |
+|-----------------------|---------------------------------------------------|
+| Selected objects only | Export only selected objects                       |
+| Auto-sync             | Automatically re-sync at a set interval           |
+| Interval              | Auto-sync interval (5s / 10s / 30s / 1m)         |
 
-| 設定 | 説明 |
-|------|------|
-| 選択オブジェクトのみ | チェック時、選択中のオブジェクトだけをエクスポート |
-| 自動同期 | 有効にすると指定間隔で自動的にモデルを同期 |
-| 間隔 | 自動同期の間隔（5 秒 / 10 秒 / 30 秒 / 1 分） |
+### Workflow
 
-### URL を生成する
+1. Click **Generate URL** to create a shareable URL on the server
+2. Click **Sync** (or **Start Sync** if auto-sync is enabled) to upload your model
+3. Use the action buttons to copy the URL, open it in a browser, or launch VRChat
 
-**「URL を生成」** ボタンを押すとサーバー上に共有枠が作成され、共有 URL が発行されます。URL はモデルの再同期を行っても変わりません。
-
-### モデルを同期する
-
-URL 生成後に同期ボタンが表示されます。
-
-- **自動同期が有効** → **「同期を開始」** で設定間隔の自動同期が始まります
-- **自動同期が無効** → **「今すぐ同期」** で 1 回だけ同期します
-
-同期中は **「同期を停止」** で自動同期を停止できます。
-
-### モデルを確認する
-
-| ボタン | 動作 |
-|--------|------|
-| URL をコピー | 共有 URL をクリップボードにコピー |
-| Web で確認 | ブラウザで共有ページを開く |
-| VRChat で確認 | VRChat のビューワーワールドを起動 |
-
-## ビルド
+## Build
 
 ```bash
 cd apps/blender-addon
 python scripts/build.py
 ```
 
-`dist/galbi_addon.zip` が生成されます。このファイルを Blender の **Install from File** で直接インストールできます。
+Produces `dist/galbi_addon.zip`, ready for Blender's **Install from File**.
 
-## ファイル構成
+## Technical Details
 
-```
+### API Communication
+
+Communicates with the Galbi tRPC API using `urllib.request` (no external HTTP libraries).
+
+**Flow:**
+
+1. `createAnonymousModel` — Creates a model slot and returns `modelId`, `accessToken`, and `publicUrl`
+2. `uploadModel` — Uploads the GLB file (base64-encoded) to the server
+
+### Non-blocking I/O
+
+API calls run on `threading.Thread` to avoid freezing the Blender UI. A `modal` operator with `event_timer` polls for results on the main thread, ensuring all Blender API calls happen safely.
+
+### GLB Export
+
+Uses `bpy.ops.export_scene.gltf()` to write a temporary GLB file, base64-encodes it for the API, and cleans up the temp file automatically.
+
+## File Structure
+
+```text
 apps/blender-addon/
 ├── galbi_addon/
-│   ├── __init__.py        # アドオン登録・bl_info
-│   ├── api_client.py      # tRPC HTTP クライアント（urllib のみ）
-│   ├── exporter.py        # GLB エクスポート → base64 変換
-│   ├── operators.py       # Blender オペレーター
-│   ├── panels.py          # サイドバー UI
-│   ├── preferences.py     # アドオン設定（サーバー切り替え）
-│   ├── state.py           # PropertyGroup による状態管理
-│   └── i18n.py            # 多言語対応（日本語 / 英語）
+│   ├── __init__.py        # Addon registration & bl_info
+│   ├── api_client.py      # tRPC HTTP client (urllib only)
+│   ├── exporter.py        # GLB export & base64 encoding
+│   ├── operators.py       # Blender operators
+│   ├── panels.py          # Sidebar UI
+│   ├── preferences.py     # Addon settings (server toggle)
+│   ├── state.py           # PropertyGroup state management
+│   └── i18n.py            # Translations (ja / en)
 ├── scripts/
-│   └── build.py           # zip パッケージ生成
-├── LICENSE                # MIT License
+│   └── build.py           # Zip package builder
+├── LICENSE
 ├── .gitignore
 └── README.md
 ```
 
-## 技術詳細
+## Development
 
-### API 通信
-
-Galbi API（tRPC v11）に対して `urllib.request` で HTTP リクエストを送信します。
-
-**フロー:**
-
-1. `createAnonymousModel` — 共有枠を作成し `modelId` / `accessToken` / `publicUrl` を取得
-2. `uploadModel` — GLB（base64）をアップロード
-
-### 非ブロッキング処理
-
-UI をフリーズさせないため、API 通信は `threading.Thread` で実行し、`modal` オペレーター + `event_timer` でメインスレッドからポーリングしています。Blender API へのアクセスはすべてメインスレッドで行います。
-
-### GLB エクスポート
-
-`bpy.ops.export_scene.gltf()` で一時ファイルに GLB を書き出し、base64 エンコードして API に送信します。一時ファイルはエクスポート後に自動削除されます。
-
-## 開発
-
-Galbi SDK モノレポの一部として開発されています。ローカルでの開発手順はリポジトリルートの [README](https://github.com/yushimatenjin/galbi-sdk#readme) を参照してください。
-
-ローカルサーバーを起動してアドオンのテストを行う場合:
+This addon is part of the Galbi SDK monorepo. To test with a local server:
 
 ```bash
-# リポジトリルートで
+# From the repository root
 pnpm dev
 ```
 
-API が `http://localhost:3001` で起動するので、アドオンのサーバー設定を **ローカル** に切り替えて使用します。
+The API starts at `http://localhost:3001`. Switch the addon's server setting to **Local** to connect.
 
-## ライセンス
+## License
 
 [MIT](./LICENSE)
