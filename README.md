@@ -1,159 +1,148 @@
-# Galbi SDK
+# Galbi
 
-Real-time 3D model synchronization SDK for WebXR, VRChat, and collaborative 3D workflows.
+Galbi は、VRChat 向けのワールド制作で「毎回アップロードせずに確認したい」という課題を軽くするためのツール集です。
 
-Galbi lets you instantly share 3D scenes from PlayCanvas or Blender via a simple URL — no login required.
+制作途中の 3D データを共有 URL に同期し、VRChat の確認用ワールドから見た目を確認できるようにすることで、修正と確認の往復を速くします。
 
-## Features
+## 何ができるのか
 
-- **Instant Sharing** — Generate a public URL for any 3D scene in one click
-- **Real-time Sync** — Auto-sync changes at configurable intervals (5s / 10s / 30s / 1m)
-- **Multi-platform** — Works in PlayCanvas (Web SDK) and Blender (Addon)
-- **VRChat Ready** — View shared models directly in VRChat viewer worlds
-- **Export Formats** — GLB, GLTF, and STL export support
-- **No Auth Required** — Anonymous model creation with 24-hour expiration
-- **Multi-language** — UI supports Japanese, English, and Korean
+- 制作途中のデータを URL ベースで共有できる
+- 同じ URL のまま中身だけ再同期できる
+- VRChat に正式アップロードする前の状態を確認できる
+- PlayCanvas と Blender の 2 つのワークフローに対応している
 
-## Architecture
+## 対応しているワークフロー
+
+| ソース | 確認先 | 概要 | テクスチャ対応 | 参照先 |
+|---|---|---|---|---|
+| PlayCanvas | VRChat | PlayCanvas で作ったワールドやシーンを共有・再同期して確認 | 対応 | [ドキュメントサイト](https://galbi-sdk-docs.pages.dev/) |
+| Blender | VRChat | Blender で作った 3D モデルを Addon から送信して確認 | 未対応 | [Blender Addon README](./apps/blender-addon/README.md) |
+
+## VRChat 側で確認する方法
+
+Galbi で共有したデータは、確認用ワールドからそのまま見た目を確認できます。
+
+- 確認用ワールド: [Galbi Viewer World](https://vrchat.com/home/launch?worldId=wrld_068ed758-68b1-40bc-b647-f54c3b3d92fc)
+- 自分のワールドに組み込みたい場合: [GLB Loader](https://booth.pm/ja/items/6279803) / [GitHub](https://github.com/vr-voyage/vrchat-glb-loader)
+
+`GLB Loader` を導入すると、Galbi の共有 URL を使うワークフローを自分の VRChat ワールド側に組み込めます。検証用ワールドを使うだけでなく、自分の確認環境に合わせて運用したい場合はこちらを使ってください。
+
+## PlayCanvas -> VRChat
+
+PlayCanvas 側のワークフローでは、シーンやワールドを編集しながら共有 URL を発行し、同じ URL に対して更新を反映していきます。
+
+流れはシンプルです。
+
+1. PlayCanvas でシーンを編集する
+2. Galbi SDK で共有 URL を生成する
+3. 同じ URL に対して再同期する
+4. VRChat の確認用ワールドから見た目を確認する
+
+PlayCanvas 側はテクスチャを含めた確認フローを前提にしています。導入や使い方は [ドキュメントサイト](https://galbi-sdk-docs.pages.dev/) を参照してください。VRChat 側では確認用ワールドまたは `GLB Loader` を導入した自分のワールドで確認できます。
+
+## Blender -> VRChat
+
+Blender 側のワークフローでは、3D モデルを Addon から送信し、VRChat 側で確認します。
+
+1. Blender でモデルを編集する
+2. Galbi Blender Addon で共有 URL を生成する
+3. GLB を再同期する
+4. VRChat の確認用ワールドから見た目を確認する
+
+Blender Addon は現在、画像テクスチャのエクスポートには未対応です。形状とマテリアル値の確認を優先したフローになっています。詳しくは [Blender Addon README](./apps/blender-addon/README.md) を参照してください。
+
+## このプロジェクトの強み
+
+- VRChat 向けの確認フローに目的を絞っている
+- PlayCanvas と Blender の両方をカバーしている
+- 共有 URL を固定したまま更新を反映できる
+- SDK、Blender Addon、API、DB、ドキュメントが一式そろっている
+
+## まず知っておいてほしいこと
+
+- 認証機能はありません
+- 共有は匿名 URL ベースです
+- PlayCanvas と Blender は別ワークフローです
+- Blender Addon では画像テクスチャのエクスポートはまだ未対応です
+- PlayCanvas Editor へのアップロード自動化はまだ入っていません
+
+## 含まれるもの
 
 ```text
 apps/
-  sdk/              Web SDK (Vite library build, React, PlayCanvas)
-  docs/             Documentation site (VitePress)
-  blender-addon/    Blender addon for 3D model sync
+  sdk/                PlayCanvas 向け Web SDK
+  docs/               ドキュメントサイト
+  blender-addon/      Blender Addon
 
 packages/
-  api/              API server (Cloudflare Workers + Hono + tRPC)
-  database/         Data layer (Cloudflare D1 + Prisma)
-  tooling-config/   Shared Biome & TypeScript configs
+  api/                Cloudflare Workers API
+  database/           Cloudflare D1 / Prisma
+  tooling-config/     共有ツール設定
 ```
 
-## Prerequisites
+## はじめかた
 
-- [Node.js](https://nodejs.org/) v18+
-- [pnpm](https://pnpm.io/) v9+
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/) v4+
+必要なもの:
 
-## Getting Started
+- Node.js 18 以上
+- pnpm 9 以上
+- Wrangler CLI 4 以上
+- Blender 3.6 以上（Blender Addon を使う場合）
+
+インストール:
 
 ```bash
-# Install dependencies (also initializes local D1 database)
 pnpm install
-
-# Start all services
-pnpm dev
 ```
 
-The `postinstall` script automatically runs `wrangler d1 migrations apply --local` to set up the local database. To skip this:
+`pnpm install` の完了時にローカル D1 の初期化まで実行されます。通常はそのままで問題ありません。
 
-```bash
-SKIP_LOCAL_D1_SETUP=1 pnpm install
-```
-
-### Environment Variables
+必要に応じて環境変数ファイルを作成します。
 
 ```bash
 cp packages/api/.dev.vars.example packages/api/.dev.vars
 cp apps/sdk/.env.example apps/sdk/.env.local
 ```
 
-Edit `.dev.vars` to configure OIDC settings as needed.
-
-## Development
+確認は基本的にこれだけです。
 
 ```bash
-pnpm dev
+pnpm run dev
 ```
 
-| Service  | Port | Description            |
-|----------|------|------------------------|
-| Database | 3002 | D1 Worker (Prisma)     |
-| API      | 3001 | Hono + tRPC            |
-| SDK      | 5174 | Vite dev server        |
-| Docs     | 5175 | VitePress              |
+これで API / Database / SDK / Docs がまとめて起動し、ローカルで動作確認できます。
 
-## Build
+## PlayCanvas 向け SDK
+
+PlayCanvas 側の導入と使い方は [ドキュメントサイト](https://galbi-sdk-docs.pages.dev/) を参照してください。ローカル確認は root で `pnpm run dev` を実行すれば進められます。
+
+## Blender Addon
+
+インストール:
+
+- [Releases](https://github.com/yushimatenjin/galbi-sdk/releases) から `galbi_addon.zip` を取得
+- Blender の `Install from File` から導入
+
+ローカルでビルドしたい場合:
 
 ```bash
-pnpm build       # Build all packages
-pnpm check       # Biome check (format + lint)
-pnpm test        # Run tests
+cd apps/blender-addon
+python scripts/build.py
 ```
 
-### SDK Build Output
+`apps/blender-addon/dist/galbi_addon.zip` が生成されます。
 
-```bash
-pnpm -F @repo/sdk build
-```
+制限事項:
 
-Produces:
+- 画像テクスチャは現在エクスポート対象外です
+- 形状とマテリアル値の確認を優先したフローです
 
-| File               | Format | Use Case                        |
-|--------------------|--------|---------------------------------|
-| `galbi.es.mjs`     | ESM    | Bundlers & modern environments  |
-| `galbi.umd.js`     | UMD    | CommonJS & global variable      |
-| `galbi.css`        | CSS    | Tailwind CSS stylesheet         |
-| `types/index.d.ts` | DTS    | TypeScript type definitions     |
+## 関連 README
 
-### PlayCanvas Build
+- [apps/sdk/README.md](./apps/sdk/README.md)
+- [apps/docs/README.md](./apps/docs/README.md)
+- [apps/blender-addon/README.md](./apps/blender-addon/README.md)
 
-```bash
-pnpm -F @repo/sdk build:playcanvas
-```
-
-Generates `dist/playcanvas/galbi.mjs` for use in the PlayCanvas Editor.
-
-## Workspace Commands
-
-```bash
-# API
-pnpm -F @repo/api dev
-pnpm -F @repo/api deploy
-pnpm -F @repo/api test
-
-# SDK
-pnpm -F @repo/sdk dev
-pnpm -F @repo/sdk build
-pnpm -F @repo/sdk build:playcanvas
-
-# Docs
-pnpm -F @repo/docs dev
-pnpm -F @repo/docs deploy
-
-# Database
-pnpm -F @repo/database dev
-pnpm -F @repo/database db:generate
-pnpm -F @repo/database db:migrate:from-schema
-pnpm -F @repo/database db:migrate:local
-pnpm -F @repo/database db:migrate:remote
-```
-
-## How It Works
-
-1. **Generate URL** — Creates an anonymous model entry on the server with a unique public URL
-2. **Sync** — Exports the 3D scene as GLB and uploads it to R2 storage
-3. **Share** — Anyone with the URL can view the model in a browser or VRChat
-4. **Auto-sync** — Optionally polls for changes and re-uploads at a set interval
-
-## Tech Stack
-
-| Layer     | Technology                          |
-|-----------|-------------------------------------|
-| SDK       | React, PlayCanvas, Vite, tRPC      |
-| API       | Hono, tRPC, Zod, Cloudflare Workers|
-| Database  | Prisma, Cloudflare D1 (SQLite)     |
-| Storage   | Cloudflare R2                       |
-| Docs      | VitePress                           |
-| Tooling   | Turbo, pnpm, Biome, Husky          |
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
+## ライセンス
 
 [MIT](./LICENSE)

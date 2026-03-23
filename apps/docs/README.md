@@ -1,50 +1,49 @@
 # @repo/docs
 
-Documentation site for Galbi SDK, built with VitePress.
+Galbi のドキュメントサイトです。VitePress で構成されており、セットアップ手順、利用方法、ワールド制作向けガイドをまとめています。
 
-## Overview
+## 開発
 
-Multi-language documentation covering setup, usage, and guides for the Galbi SDK ecosystem. Supports Japanese, English, and Korean.
-
-## Development
+通常はリポジトリ root で `pnpm run dev` を実行すればまとめて確認できます。ドキュメントだけを起動したい場合は次を使います。
 
 ```bash
 pnpm -F @repo/docs dev
 ```
 
-The dev server starts at `http://localhost:5175`.
+開発サーバーは `http://localhost:5175` で起動します。
 
-## Build & Deploy
+## ビルドとデプロイ
 
 ```bash
-pnpm -F @repo/docs build    # Static site generation
-pnpm -F @repo/docs deploy   # Deploy to Cloudflare Pages
+pnpm -F @repo/docs build
+pnpm -F @repo/docs deploy
 ```
 
-## Structure
+## ディレクトリ構成
 
 ```text
 .vitepress/
-  config.ts         VitePress configuration (multi-locale)
+  config.ts         VitePress 設定
 
-guide/              Japanese documentation (root locale)
-en/guide/           English documentation
-ko/guide/           Korean documentation
+guide/              日本語ドキュメント
+en/guide/           英語ドキュメント
+ko/guide/           韓国語ドキュメント
 ```
 
-### Guide Sections
+### 主な内容
 
-- **Basic Usage** — Overview, environment setup, world creation, VRChat sync
-- **World Creation Tips** — Textures, Blender model import, collaboration
-- **After Completion** — 3D model export and upload
-- **Links** — Release notes, Discord, PlayCanvas docs
+- 基本的な使い方
+- 環境構築
+- ワールド制作の流れ
+- VRChat での確認方法
+- Blender / PlayCanvas まわりの補足
 
-## Adding a New Language
+## 新しい言語を追加する場合
 
-1. Create a new locale directory (e.g., `zh/guide/`)
-2. Add locale configuration in `.vitepress/config.ts`
-3. Translate the markdown files
+1. 追加したいロケールのディレクトリを作成する
+2. `.vitepress/config.ts` にロケール設定を追加する
+3. 対象の Markdown を翻訳する
 
-## License
+## ライセンス
 
 [MIT](../../LICENSE)

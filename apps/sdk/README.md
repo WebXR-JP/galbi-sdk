@@ -1,23 +1,21 @@
 # @repo/sdk
 
-Web SDK for real-time 3D model sharing via PlayCanvas.
+PlayCanvas 向けの Galbi Web SDK です。
 
-## Overview
+PlayCanvas 上のシーンやワールドを共有 URL に同期し、VRChat 側の確認フローへつなぐための機能を提供します。認証なしで URL を生成し、再同期や自動同期を行えるのが特徴です。
 
-A lightweight library that adds instant model-sharing capabilities to any PlayCanvas application. Users can generate a shareable URL, sync their scene, and optionally enable auto-sync — all without authentication.
+## 開発
 
-## Installation
-
-This package is part of the Galbi SDK monorepo. From the repository root:
+このパッケージは Galbi モノレポの一部です。通常はリポジトリ root で次を実行すれば確認できます。
 
 ```bash
 pnpm install
-pnpm -F @repo/sdk dev
+pnpm run dev
 ```
 
-The dev server starts at `http://localhost:5174`.
+SDK の開発サーバーは `http://localhost:5174` で起動します。
 
-## Usage
+## 使い方
 
 ```ts
 import { Galbi } from "@repo/sdk";
@@ -33,18 +31,18 @@ const galbi = new Galbi({
 galbi.start();
 ```
 
-### Core API
+### 主な API
 
-| Method         | Description                              |
-|----------------|------------------------------------------|
-| `start()`      | Initialize the SDK and render UI         |
-| `stop()`       | Tear down the SDK                        |
-| `upload()`     | Upload the current scene to the server   |
-| `export()`     | Export scene as GLB                      |
-| `exportGltf()` | Export scene as GLTF                     |
-| `exportStl()`  | Export scene as STL                      |
+| メソッド | 説明 |
+|---|---|
+| `start()` | SDK を初期化して UI を表示 |
+| `stop()` | SDK を停止して UI を破棄 |
+| `upload()` | 現在のシーンをサーバーへアップロード |
+| `export()` | シーンを GLB として書き出し |
+| `exportGltf()` | シーンを GLTF として書き出し |
+| `exportStl()` | シーンを STL として書き出し |
 
-### State
+### 状態
 
 ```ts
 interface GalbiState {
@@ -58,41 +56,41 @@ interface GalbiState {
 }
 ```
 
-## Build
+## ビルド
 
 ```bash
 pnpm -F @repo/sdk build
 ```
 
-### Output
+### 生成物
 
-| File               | Format | Description                     |
-|--------------------|--------|---------------------------------|
-| `galbi.es.mjs`     | ESM    | For bundlers & modern runtimes  |
-| `galbi.umd.js`     | UMD    | CommonJS & global variable      |
-| `galbi.css`        | CSS    | Tailwind CSS stylesheet         |
-| `types/index.d.ts` | DTS    | TypeScript type definitions     |
+| ファイル | 形式 | 説明 |
+|---|---|---|
+| `galbi.es.mjs` | ESM | モダンな実行環境や bundler 向け |
+| `galbi.umd.js` | UMD | グローバル変数経由で使う構成向け |
+| `galbi.css` | CSS | SDK 用スタイルシート |
+| `types/index.d.ts` | DTS | TypeScript 型定義 |
 
-### PlayCanvas Editor Build
+### PlayCanvas Editor 向けビルド
 
 ```bash
 pnpm -F @repo/sdk build:playcanvas
 ```
 
-Produces `dist/playcanvas/galbi.mjs` for upload to the PlayCanvas Editor.
+`dist/playcanvas/galbi.mjs` が生成され、PlayCanvas Editor にアップロードして使えます。
 
-## Key Files
+## 主なファイル
 
-| File                              | Purpose                          |
-|-----------------------------------|----------------------------------|
-| `src/Galbi.ts`                    | Main SDK class & public API      |
-| `src/popup.ts`                    | Popup UI & sync flow             |
-| `src/store.ts`                    | State management                 |
-| `src/galbi-gltf-exporter.ts`     | GLTF/GLB export                  |
-| `src/galbi-stl-exporter.ts`      | STL export                       |
-| `src/services/storage.service.ts` | IndexedDB persistence            |
-| `src/i18n/`                       | Translations (ja, en, ko)        |
+| ファイル | 役割 |
+|---|---|
+| `src/Galbi.ts` | SDK 本体と公開 API |
+| `src/popup.ts` | ポップアップ UI と同期フロー |
+| `src/store.ts` | 状態管理 |
+| `src/galbi-gltf-exporter.ts` | GLTF / GLB 書き出し |
+| `src/galbi-stl-exporter.ts` | STL 書き出し |
+| `src/services/storage.service.ts` | IndexedDB への保存 |
+| `src/i18n/` | 翻訳ファイル（ja / en / ko） |
 
-## License
+## ライセンス
 
 [MIT](../../LICENSE)
