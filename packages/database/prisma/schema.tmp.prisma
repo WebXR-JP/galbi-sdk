@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  runtime  = "cloudflare"
+}
+
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:tmp-migrate.db"
+}
+
+model Model {
+  id          String   @id @default(uuid())
+  accessToken String   @unique @default(uuid())
+  publicUrl   String?  @unique
+  name        String?
+  description String?
+  fileUrl     String?
+  fileHash    String?
+  version     Int      @default(1)
+  previewUrl  String?
+  fileSize    Int?
+  format      String?
+  tags        String
+  isAnonymous Boolean  @default(false)
+  uploadedAt  DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  expiresAt   DateTime?
+
+  @@map("models")
+}
+

@@ -1,0 +1,31 @@
+{
+	"name": "@repo/api",
+	"version": "0.0.1",
+	"main": "./src/index.ts",
+	"types": "./src/index.ts",
+	"private": true,
+	"scripts": {
+		"dev": "wrangler dev --port 3001",
+		"deploy": "wrangler deploy --minify",
+		"check": "biome check --config-path ../../packages/tooling-config/biome/src-only.json --write .",
+		"lint": "biome lint --config-path ../../packages/tooling-config/biome/src-only.json --write .",
+		"format": "biome format --config-path ../../packages/tooling-config/biome/src-only.json --write .",
+		"test": "vitest run --passWithNoTests",
+		"test:coverage": "vitest run --coverage --passWithNoTests"
+	},
+	"dependencies": {
+		"@hono/trpc-server": "^0.3.4",
+		"@repo/database": "workspace:*",
+		"@trpc/server": "catalog:",
+		"hono": "^4.12.8",
+		"zod": "^3.24.1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "catalog:biome",
+		"@cloudflare/workers-types": "catalog:",
+		"@repo/tooling-config": "workspace:*",
+		"@types/node": "^20.16.5",
+		"vitest": "catalog:",
+		"wrangler": "catalog:"
+	}
+}

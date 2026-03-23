@@ -1,0 +1,13 @@
+name = "galbi-api"
+main = "src/index.ts"
+
+compatibility_date = "2026-03-23"
+compatibility_flags = ["nodejs_compat"]
+
+services = [
+    { binding = "DATABASE", service = "galbi-database" },
+]
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "galbi-r2"

@@ -1,0 +1,10 @@
+name = "galbi-database"
+main = "src/index.ts"
+
+compatibility_date = "2026-03-23"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "galbi-database"
+database_id = "your-d1-database-id"
