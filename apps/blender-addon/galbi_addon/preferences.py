@@ -1,8 +1,11 @@
 """アドオン設定"""
 
+import urllib.parse
+
 import bpy
 
-GALBI_SERVER_URL = "http://galbi.yutt.net"
+GALBI_SERVER_URL = "https://galbi.yutt.net"
+LOCAL_SERVER_URL = "http://127.0.0.1:3001"
 
 
 class GalbiAddonPreferences(bpy.types.AddonPreferences):
@@ -20,7 +23,7 @@ class GalbiAddonPreferences(bpy.types.AddonPreferences):
     local_url: bpy.props.StringProperty(
         name="ローカルURL",
         description="ローカルサーバーのURL",
-        default="http://localhost:3001",
+        default=LOCAL_SERVER_URL,
     )
 
     def draw(self, context):
@@ -33,7 +36,21 @@ class GalbiAddonPreferences(bpy.types.AddonPreferences):
 def get_server_url(context):
     prefs = context.preferences.addons[__package__].preferences
     if prefs.server_mode == "LOCAL":
-        return prefs.local_url.rstrip("/")
+        local_url = prefs.local_url.rstrip("/")
+        parsed = urllib.parse.urlsplit(local_url)
+        if parsed.hostname == "localhost":
+            netloc = "127.0.0.1"
+            if parsed.port:
+                netloc = f"{netloc}:{parsed.port}"
+            if parsed.username:
+                auth = parsed.username
+                if parsed.password:
+                    auth = f"{auth}:{parsed.password}"
+                netloc = f"{auth}@{netloc}"
+            return urllib.parse.urlunsplit(
+                (parsed.scheme, netloc, parsed.path, parsed.query, parsed.fragment)
+            )
+        return local_url
     return GALBI_SERVER_URL
 
 

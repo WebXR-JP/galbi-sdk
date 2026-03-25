@@ -62,6 +62,9 @@ class GALBI_PT_main(bpy.types.Panel):
 
             row = url_box.row(align=True)
             row.operator("galbi.open_url", text="Webで確認", icon="URL")
+            row.operator("galbi.open_meta_quest", text="Questで確認", icon="URL")
+
+            row = url_box.row(align=True)
             row.operator("galbi.open_vrchat", text="VRChatで確認", icon="PLAY")
 
             # --- 同期コントロール ---

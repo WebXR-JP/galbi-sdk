@@ -1,6 +1,6 @@
-# Galbi Blender Addon
+ｂ# Galbi Blender Addon
 
-Blender から 3D モデルを GLB として書き出し、Galbi の共有 URL に同期するための Addon です。Blender 上で URL 発行、再同期、VRChat での確認まで進められます。
+Blender から 3D モデルを GLB として書き出し、Galbi の共有 URL に同期するための Addon です。Blender 上で URL 発行、再同期、VRChat での確認に加え、Meta Quest の Web Launch 経由で Meta Browser を開けます。
 
 外部の Python パッケージは不要で、Blender に同梱されている標準ライブラリだけで動作します。
 
@@ -10,6 +10,7 @@ Blender から 3D モデルを GLB として書き出し、Galbi の共有 URL �
 |---|---|
 | Blender | 3.6 以上（4.x / 5.x で確認） |
 | Python | Blender 同梱版 |
+| Meta Quest 連携 | HTTPS で公開された共有 URL |
 
 ## インストール
 
@@ -44,8 +45,15 @@ Blender から 3D モデルを GLB として書き出し、Galbi の共有 URL �
 
 | ボタン | 接続先 |
 |---|---|
-| **Local** | ローカル開発サーバー（既定） |
+| **Local** | ローカル開発サーバー（既定: `http://127.0.0.1:3001`） |
 | **galbi.yutt.net** | 公開サーバー |
+
+### Meta Quest で開く条件
+
+`Questで確認` は Meta の Web Launch を開くボタンです。共有 URL が `https://...` である必要があります。
+
+- `galbi.yutt.net` を使っている場合はそのまま利用できます
+- `Local` など `http://...` の URL は Quest 用では開けません
 
 ### エクスポート設定
 
@@ -59,7 +67,9 @@ Blender から 3D モデルを GLB として書き出し、Galbi の共有 URL �
 
 1. `Generate URL` で共有 URL を作成する
 2. `Sync` または `Start Sync` でモデルをアップロードする
-3. URL をコピーするか、ブラウザや VRChat で確認する
+3. URL をコピーするか、ブラウザ・Meta Quest・VRChat で確認する
+
+`Questで確認` を押すと、Meta の Web Launch ページを開き、`https://galbi.yutt.net/share/...` のような共有 URL を Meta Browser で開ける状態にします。
 
 ## 制限事項
 

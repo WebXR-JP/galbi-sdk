@@ -3,7 +3,7 @@
 bl_info = {
     "name": "Galbi",
     "author": "Galbi Team",
-    "version": (0, 2, 0),
+    "version": (0, 3, 1),
     "blender": (3, 6, 0),
     "location": "View3D > Sidebar > Galbi",
     "description": "Share 3D models via Galbi",

@@ -1,6 +1,7 @@
 """Blenderオペレーター"""
 
 import threading
+import urllib.parse
 import webbrowser
 
 import bpy
@@ -461,6 +462,37 @@ class GALBI_OT_open_url(bpy.types.Operator):
         return {"FINISHED"}
 
 
+META_QUEST_WEB_LAUNCH_URL = "https://www.oculus.com/open_url/?url={url}"
+
+
+class GALBI_OT_open_meta_quest(bpy.types.Operator):
+    """Meta Quest のブラウザで共有URLを開く"""
+
+    bl_idname = "galbi.open_meta_quest"
+    bl_label = "Questで確認"
+    bl_description = "接続中のMeta QuestへURLを送り、Meta Browserで開きます"
+
+    def execute(self, context):
+        url = context.scene.galbi.public_url
+        if not url:
+            self.report({"WARNING"}, "開くURLがありません")
+            return {"CANCELLED"}
+
+        parsed = urllib.parse.urlparse(url)
+        if parsed.scheme != "https":
+            self.report(
+                {"ERROR"},
+                "Questで確認は https の共有URLのみ対応です。公開サーバーを使ってください",
+            )
+            return {"CANCELLED"}
+
+        encoded_url = urllib.parse.quote(url, safe="")
+        launch_url = META_QUEST_WEB_LAUNCH_URL.format(url=encoded_url)
+        webbrowser.open(launch_url)
+        self.report({"INFO"}, "Meta Quest 用の Web Launch を開きました")
+        return {"FINISHED"}
+
+
 VRCHAT_WORLD_URL = "https://vrchat.com/home/launch?worldId=wrld_068ed758-68b1-40bc-b647-f54c3b3d92fc"
 
 
@@ -485,6 +517,7 @@ CLASSES = [
     GALBI_OT_auto_sync,
     GALBI_OT_copy_url,
     GALBI_OT_open_url,
+    GALBI_OT_open_meta_quest,
     GALBI_OT_open_vrchat,
 ]
 
