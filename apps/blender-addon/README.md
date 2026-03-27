@@ -1,6 +1,6 @@
-ｂ# Galbi Blender Addon
+# Galbi Blender Addon
 
-Blender から 3D モデルを GLB として書き出し、Galbi の共有 URL に同期するための Addon です。Blender 上で URL 発行、再同期、VRChat での確認に加え、Meta Quest の Web Launch 経由で Meta Browser を開けます。
+Blender から 3D モデルを GLB として書き出し、Galbi の共有 URL に同期するための Addon です。Blender 上で共有 URL の作成、再同期、VRChat での確認に加え、Meta Quest の Web Launch 経由で Meta Browser を開けます。
 
 外部の Python パッケージは不要で、Blender に同梱されている標準ライブラリだけで動作します。
 
@@ -93,8 +93,8 @@ Galbi の tRPC API と `urllib.request` で通信します。外部 HTTP ライ�
 
 主な流れ:
 
-1. `createAnonymousModel` で URL 用のモデルスロットを作成
-2. `uploadModel` で base64 化した GLB をアップロード
+1. `anonymous.createAnonymousModel` で共有先のモデルスロットを作成
+2. `anonymous.uploadModel` で base64 化した GLB をアップロード
 
 ### Blender UI を止めない設計
 

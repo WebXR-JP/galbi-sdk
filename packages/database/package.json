@@ -10,9 +10,10 @@
 		"db:migrate:from-schema": "node scripts/generate-wrangler-migration.cjs",
 		"db:migrate:local": "wrangler d1 migrations apply galbi-database --local",
 		"db:migrate:remote": "wrangler d1 migrations apply galbi-database --remote",
-		"check": "biome check --config-path ../../packages/tooling-config/biome/database.json --write .",
-		"lint": "biome lint --config-path ../../packages/tooling-config/biome/database.json --write .",
-		"format": "biome format --config-path ../../packages/tooling-config/biome/database.json --write ."
+		"deploy": "wrangler deploy --minify",
+		"check": "biome check --config-path ../../packages/config/biome/database.json --write .",
+		"lint": "biome lint --config-path ../../packages/config/biome/database.json --write .",
+		"format": "biome format --config-path ../../packages/config/biome/database.json --write ."
 	},
 	"dependencies": {
 		"@prisma/adapter-d1": "^7.5.0",
@@ -21,7 +22,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "catalog:biome",
 		"@cloudflare/workers-types": "catalog:",
-		"@repo/tooling-config": "workspace:*",
+		"@repo/config": "workspace:*",
 		"prisma": "^7.5.0",
 		"wrangler": "catalog:"
 	}

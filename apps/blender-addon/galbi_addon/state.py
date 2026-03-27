@@ -20,6 +20,7 @@ class GalbiState(bpy.types.PropertyGroup):
         default="READY",
     )
 
+    # NOTE: keep the RNA property name for backward compatibility with existing .blend files.
     public_url: bpy.props.StringProperty(name="共有URL", default="")
     error_message: bpy.props.StringProperty(name="エラーメッセージ", default="")
 

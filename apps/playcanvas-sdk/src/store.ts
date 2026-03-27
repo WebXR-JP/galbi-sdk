@@ -1,32 +1,31 @@
-// src/store.ts
-
 import { trpc } from "./trpc";
 import type { AnonymousModelResponse, GalbiState } from "./types";
 
-// ファイルアップロード用の型を定義
-type FileUpload = {
+type UploadModelInput = {
 	name: string;
 	data: string;
 };
+
 export class GalbiStore {
 	private state: GalbiState = {
 		isAutoUpload: false,
+		shareUrl: "",
 		uploadUrl: "",
 		isAnonymous: false,
 		isLoading: false,
 	};
-	private listeners: ((state: GalbiState) => void)[] = [];
+	private subscribers: ((state: GalbiState) => void)[] = [];
 
 	getState(): GalbiState {
 		return this.state;
 	}
 
-	setState(newState: Partial<GalbiState>): void {
-		this.state = { ...this.state, ...newState };
-		this.notifyListeners();
+	setState(statePatch: Partial<GalbiState>): void {
+		this.state = { ...this.state, ...this.normalizeStatePatch(statePatch) };
+		this.notifySubscribers();
 	}
 
-	setAnonymousAccess(response: AnonymousModelResponse): void {
+	setAnonymousSession(response: AnonymousModelResponse): void {
 		this.state = {
 			...this.state,
 			isAnonymous: true,
@@ -34,10 +33,10 @@ export class GalbiStore {
 			anonymousModelId: response.modelId,
 			anonymousExpiresAt: response.expiresAt,
 		};
-		this.notifyListeners();
+		this.notifySubscribers();
 	}
 
-	clearAnonymousAccess(): void {
+	clearAnonymousSession(): void {
 		this.state = {
 			...this.state,
 			isAnonymous: false,
@@ -45,28 +44,38 @@ export class GalbiStore {
 			anonymousModelId: undefined,
 			anonymousExpiresAt: undefined,
 		};
-		this.notifyListeners();
+		this.notifySubscribers();
 	}
 
-	subscribe(listener: (state: GalbiState) => void): () => void {
-		this.listeners.push(listener);
+	subscribe(subscriber: (state: GalbiState) => void): () => void {
+		this.subscribers.push(subscriber);
 		return () => {
-			this.listeners = this.listeners.filter(l => l !== listener);
+			this.subscribers = this.subscribers.filter(listener => listener !== subscriber);
 		};
 	}
 
-	private notifyListeners(): void {
-		for (const listener of this.listeners) {
-			listener(this.state);
+	private normalizeStatePatch(statePatch: Partial<GalbiState>): Partial<GalbiState> {
+		const normalizedPatch = { ...statePatch };
+
+		if (typeof statePatch.shareUrl === "string") {
+			normalizedPatch.uploadUrl = statePatch.shareUrl;
+		} else if (typeof statePatch.uploadUrl === "string") {
+			normalizedPatch.shareUrl = statePatch.uploadUrl;
+		}
+
+		return normalizedPatch;
+	}
+
+	private notifySubscribers(): void {
+		for (const subscriber of this.subscribers) {
+			subscriber(this.state);
 		}
 	}
 
-	// ローディング状態の設定
 	setLoading(isLoading: boolean): void {
 		this.setState({ isLoading });
 	}
 
-	// 匿名モデルの作成
 	async createAnonymousModel(): Promise<AnonymousModelResponse> {
 		try {
 			this.setLoading(true);
@@ -77,7 +86,7 @@ export class GalbiStore {
 				expiresAt: result.expiresAt,
 				publicUrl: result.publicUrl,
 			};
-			this.setAnonymousAccess(response);
+			this.setAnonymousSession(response);
 			return response;
 		} catch (error) {
 			console.error("Failed to create anonymous model:", error);
@@ -87,8 +96,7 @@ export class GalbiStore {
 		}
 	}
 
-	// 匿名モデルのアップロード
-	async uploadModel(file: FileUpload): Promise<unknown> {
+	async uploadModel(file: UploadModelInput): Promise<unknown> {
 		if (!this.state.anonymousModelId || !this.state.anonymousToken) {
 			throw new Error("Anonymous model not initialized");
 		}
@@ -99,7 +107,6 @@ export class GalbiStore {
 				accessToken: this.state.anonymousToken,
 				model: file,
 			});
-			console.log("response", response);
 			return response;
 		} catch (error) {
 			console.error("Failed to upload anonymous model:", error);

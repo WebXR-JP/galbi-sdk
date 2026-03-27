@@ -33,13 +33,13 @@ class GALBI_PT_main(bpy.types.Panel):
         row.enabled = galbi.auto_sync
         row.prop(galbi, "sync_interval", text="間隔")
 
-        has_url = bool(galbi.public_url)
+        has_share_url = bool(galbi.public_url)
         is_busy = galbi.status in {"EXPORTING", "CREATING", "UPLOADING"}
 
         # --- URL生成 (常に表示) ---
         row = layout.row(align=True)
         row.enabled = not is_busy
-        if not has_url:
+        if not has_share_url:
             row.scale_y = 1.5
             row.operator("galbi.generate_url", text="URLを生成", icon="URL")
             col = layout.column()
@@ -52,10 +52,10 @@ class GALBI_PT_main(bpy.types.Panel):
             url_box = layout.box()
             url_box.label(text="共有URL:", icon="LINKED")
 
-            url_text = galbi.public_url
-            if len(url_text) > 45:
-                url_text = url_text[:42] + "..."
-            url_box.label(text=url_text)
+            share_url_label = galbi.public_url
+            if len(share_url_label) > 45:
+                share_url_label = share_url_label[:42] + "..."
+            url_box.label(text=share_url_label)
 
             row = url_box.row(align=True)
             row.operator("galbi.copy_url", text="URLをコピー", icon="COPYDOWN")

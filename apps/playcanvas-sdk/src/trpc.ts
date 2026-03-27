@@ -8,7 +8,6 @@ export const trpc = createTRPCProxyClient<AppRouter>({
 			headers() {
 				return {};
 			},
-			// エラーハンドリングの設定
 			fetch(url, options) {
 				return fetch(url, options).catch(error => {
 					console.error("tRPC Error:", error);

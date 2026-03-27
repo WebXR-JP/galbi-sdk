@@ -58,8 +58,8 @@ class GalbiAPIClient:
                 f"Unexpected response structure: {json.dumps(item)[:300]}"
             ) from exc
 
-    def create_anonymous_model(self):
-        """Create an anonymous model entry.
+    def create_share_session(self):
+        """Create a share session for a new model.
 
         Returns dict with keys: modelId, accessToken, publicUrl, expiresAt.
         """
@@ -68,8 +68,12 @@ class GalbiAPIClient:
             {},
         )
 
-    def upload_model(self, model_id, access_token, name, glb_base64):
-        """Upload a GLB model (base64-encoded) to an existing anonymous model.
+    def create_anonymous_model(self):
+        """Backward-compatible alias for `create_share_session()`."""
+        return self.create_share_session()
+
+    def upload_shared_model(self, model_id, access_token, name, glb_base64):
+        """Upload a base64-encoded GLB to an existing share session.
 
         Returns the upload result dict.
         """
@@ -85,3 +89,7 @@ class GalbiAPIClient:
             },
             timeout=120,
         )
+
+    def upload_model(self, model_id, access_token, name, glb_base64):
+        """Backward-compatible alias for `upload_shared_model()`."""
+        return self.upload_shared_model(model_id, access_token, name, glb_base64)

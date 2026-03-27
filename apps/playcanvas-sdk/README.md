@@ -1,6 +1,6 @@
-# @repo/sdk
+# @repo/playcanvas-sdk
 
-PlayCanvas 向けの Galbi Web SDK です。
+PlayCanvas 向けの Galbi SDK です。
 
 PlayCanvas 上のシーンやワールドを共有 URL に同期し、VRChat 側の確認フローへつなぐための機能を提供します。認証なしで URL を生成し、再同期や自動同期を行えるのが特徴です。
 
@@ -13,23 +13,28 @@ pnpm install
 pnpm run dev
 ```
 
-SDK の開発サーバーは `http://localhost:5174` で起動します。
+PlayCanvas SDK の開発サーバーは `http://localhost:5174` で起動します。
 
 ## 使い方
 
 ```ts
-import { Galbi } from "@repo/sdk";
+import { Galbi } from "@repo/playcanvas-sdk";
 
 const galbi = new Galbi({
   container: document.getElementById("app"),
-  app: playcanvasApp,
-  entity: rootEntity,
-  exporters: { gltf: gltfExporter, stl: stlExporter },
+  rootEntity: playcanvasApp.root,
+  exporters: {
+    gltf: gltfExporter,
+    stl: stlExporter,
+  },
   lang: "en", // "ja" | "en" | "ko"
 });
 
 galbi.start();
 ```
+
+`rootEntity` と `exporters` が現在の推奨オプションです。`targetEntity` / `gltfExporter` / `stlExporter` / `language` も互換のため引き続き受け付けます。
+旧 API の `export()` / `exportStl()` / `exportGltf()` も互換のため残していますが、新規コードでは `downloadGlb()` / `downloadStl()` / `buildUploadPayload()` を使う前提で整理しています。
 
 ### 主な API
 
@@ -38,16 +43,17 @@ galbi.start();
 | `start()` | SDK を初期化して UI を表示 |
 | `stop()` | SDK を停止して UI を破棄 |
 | `upload()` | 現在のシーンをサーバーへアップロード |
-| `export()` | シーンを GLB として書き出し |
-| `exportGltf()` | シーンを GLTF として書き出し |
-| `exportStl()` | シーンを STL として書き出し |
+| `downloadGlb()` | 現在のシーンを GLB ファイルとして保存 |
+| `downloadStl()` | 現在のシーンを STL ファイルとして保存 |
+| `buildUploadPayload()` | アップロード用の GLB データを生成 |
 
 ### 状態
 
 ```ts
 interface GalbiState {
   isAutoUpload: boolean;
-  uploadUrl: string;
+  shareUrl: string;
+  uploadUrl: string; // legacy alias of shareUrl
   isAnonymous: boolean;
   anonymousToken?: string;
   anonymousModelId?: string;
@@ -59,7 +65,7 @@ interface GalbiState {
 ## ビルド
 
 ```bash
-pnpm -F @repo/sdk build
+pnpm -F @repo/playcanvas-sdk build
 ```
 
 ### 生成物
@@ -74,7 +80,7 @@ pnpm -F @repo/sdk build
 ### PlayCanvas Editor 向けビルド
 
 ```bash
-pnpm -F @repo/sdk build:playcanvas
+pnpm -F @repo/playcanvas-sdk build:playcanvas
 ```
 
 `dist/playcanvas/galbi.mjs` が生成され、PlayCanvas Editor にアップロードして使えます。
@@ -83,12 +89,12 @@ pnpm -F @repo/sdk build:playcanvas
 
 | ファイル | 役割 |
 |---|---|
-| `src/Galbi.ts` | SDK 本体と公開 API |
+| `src/Galbi.ts` | PlayCanvas 連携の公開 API |
 | `src/popup.ts` | ポップアップ UI と同期フロー |
 | `src/store.ts` | 状態管理 |
 | `src/galbi-gltf-exporter.ts` | GLTF / GLB 書き出し |
 | `src/galbi-stl-exporter.ts` | STL 書き出し |
-| `src/services/storage.service.ts` | IndexedDB への保存 |
+| `src/services/storage.service.ts` | 共有セッションの IndexedDB 保存 |
 | `src/i18n/` | 翻訳ファイル（ja / en / ko） |
 
 ## ライセンス

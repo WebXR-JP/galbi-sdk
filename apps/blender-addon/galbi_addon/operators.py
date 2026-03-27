@@ -63,14 +63,13 @@ class GALBI_OT_generate_url(bpy.types.Operator):
     _thread_error = None
     _result = None
 
-    def _run_create(self, server_url):
+    def _run_create_share_session(self, server_url):
         try:
             client = api_client.GalbiAPIClient(server_url)
-            result = client.create_anonymous_model()
+            result = client.create_share_session()
             self._result = {
                 "model_id": result["modelId"],
                 "access_token": result["accessToken"],
-                "public_url": result.get("publicUrl", ""),
                 "share_url": f"{server_url}/share/{result.get('publicUrl', '')}",
             }
             self._thread_done = True
@@ -122,11 +121,7 @@ class GALBI_OT_generate_url(bpy.types.Operator):
         self._thread_error = None
         self._result = None
 
-        self._thread = threading.Thread(
-            target=self._run_create,
-            args=(server_url,),
-            daemon=True,
-        )
+        self._thread = threading.Thread(target=self._run_create_share_session, args=(server_url,), daemon=True)
         self._thread.start()
 
         wm = context.window_manager
@@ -151,10 +146,10 @@ class GALBI_OT_start_sync(bpy.types.Operator):
     _thread_done = False
     _thread_error = None
 
-    def _run_sync(self, server_url, model_id, access_token, scene_name, glb_base64):
+    def _run_upload_model(self, server_url, model_id, access_token, scene_name, glb_base64):
         try:
             client = api_client.GalbiAPIClient(server_url)
-            client.upload_model(model_id, access_token, f"{scene_name}.glb", glb_base64)
+            client.upload_shared_model(model_id, access_token, f"{scene_name}.glb", glb_base64)
             self._thread_done = True
         except Exception as exc:
             self._thread_error = str(exc)
@@ -212,9 +207,8 @@ class GALBI_OT_start_sync(bpy.types.Operator):
         self._thread_error = None
 
         self._thread = threading.Thread(
-            target=self._run_sync,
-            args=(server_url, galbi.model_id, galbi.access_token,
-                  scene_name, glb_base64),
+            target=self._run_upload_model,
+            args=(server_url, galbi.model_id, galbi.access_token, scene_name, glb_base64),
             daemon=True,
         )
         self._thread.start()
@@ -241,10 +235,10 @@ class GALBI_OT_manual_sync(bpy.types.Operator):
     _thread_done = False
     _thread_error = None
 
-    def _run_sync(self, server_url, model_id, access_token, scene_name, glb_base64):
+    def _run_upload_model(self, server_url, model_id, access_token, scene_name, glb_base64):
         try:
             client = api_client.GalbiAPIClient(server_url)
-            client.upload_model(model_id, access_token, f"{scene_name}.glb", glb_base64)
+            client.upload_shared_model(model_id, access_token, f"{scene_name}.glb", glb_base64)
             self._thread_done = True
         except Exception as exc:
             self._thread_error = str(exc)
@@ -297,9 +291,8 @@ class GALBI_OT_manual_sync(bpy.types.Operator):
         self._thread_error = None
 
         self._thread = threading.Thread(
-            target=self._run_sync,
-            args=(server_url, galbi.model_id, galbi.access_token,
-                  scene_name, glb_base64),
+            target=self._run_upload_model,
+            args=(server_url, galbi.model_id, galbi.access_token, scene_name, glb_base64),
             daemon=True,
         )
         self._thread.start()
@@ -346,10 +339,10 @@ class GALBI_OT_auto_sync(bpy.types.Operator):
     _thread_error = None
     _elapsed = 0.0
 
-    def _run_sync(self, server_url, model_id, access_token, scene_name, glb_base64):
+    def _run_upload_model(self, server_url, model_id, access_token, scene_name, glb_base64):
         try:
             client = api_client.GalbiAPIClient(server_url)
-            client.upload_model(model_id, access_token, f"{scene_name}.glb", glb_base64)
+            client.upload_shared_model(model_id, access_token, f"{scene_name}.glb", glb_base64)
             self._thread_done = True
         except Exception as exc:
             self._thread_error = str(exc)
@@ -398,9 +391,8 @@ class GALBI_OT_auto_sync(bpy.types.Operator):
         self._thread_done = False
         self._thread_error = None
         self._thread = threading.Thread(
-            target=self._run_sync,
-            args=(server_url, galbi.model_id, galbi.access_token,
-                  scene_name, glb_base64),
+            target=self._run_upload_model,
+            args=(server_url, galbi.model_id, galbi.access_token, scene_name, glb_base64),
             daemon=True,
         )
         self._thread.start()
@@ -435,12 +427,12 @@ class GALBI_OT_copy_url(bpy.types.Operator):
     bl_description = "共有URLをクリップボードにコピーします"
 
     def execute(self, context):
-        url = context.scene.galbi.public_url
-        if not url:
+        share_url = context.scene.galbi.public_url
+        if not share_url:
             self.report({"WARNING"}, "コピーするURLがありません")
             return {"CANCELLED"}
 
-        context.window_manager.clipboard = url
+        context.window_manager.clipboard = share_url
         self.report({"INFO"}, "URLをコピーしました")
         return {"FINISHED"}
 
@@ -453,12 +445,12 @@ class GALBI_OT_open_url(bpy.types.Operator):
     bl_description = "共有URLをブラウザで開きます"
 
     def execute(self, context):
-        url = context.scene.galbi.public_url
-        if not url:
+        share_url = context.scene.galbi.public_url
+        if not share_url:
             self.report({"WARNING"}, "開くURLがありません")
             return {"CANCELLED"}
 
-        webbrowser.open(url)
+        webbrowser.open(share_url)
         return {"FINISHED"}
 
 
@@ -473,12 +465,12 @@ class GALBI_OT_open_meta_quest(bpy.types.Operator):
     bl_description = "接続中のMeta QuestへURLを送り、Meta Browserで開きます"
 
     def execute(self, context):
-        url = context.scene.galbi.public_url
-        if not url:
+        share_url = context.scene.galbi.public_url
+        if not share_url:
             self.report({"WARNING"}, "開くURLがありません")
             return {"CANCELLED"}
 
-        parsed = urllib.parse.urlparse(url)
+        parsed = urllib.parse.urlparse(share_url)
         if parsed.scheme != "https":
             self.report(
                 {"ERROR"},
@@ -486,7 +478,7 @@ class GALBI_OT_open_meta_quest(bpy.types.Operator):
             )
             return {"CANCELLED"}
 
-        encoded_url = urllib.parse.quote(url, safe="")
+        encoded_url = urllib.parse.quote(share_url, safe="")
         launch_url = META_QUEST_WEB_LAUNCH_URL.format(url=encoded_url)
         webbrowser.open(launch_url)
         self.report({"INFO"}, "Meta Quest 用の Web Launch を開きました")

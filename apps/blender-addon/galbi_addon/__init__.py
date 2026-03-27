@@ -1,4 +1,4 @@
-"""Galbi – 3D Model Sharing addon for Blender."""
+"""Galbi Blender Addon."""
 
 bl_info = {
     "name": "Galbi",
@@ -6,7 +6,7 @@ bl_info = {
     "version": (0, 3, 1),
     "blender": (3, 6, 0),
     "location": "View3D > Sidebar > Galbi",
-    "description": "Share 3D models via Galbi",
+    "description": "Share Blender models via Galbi",
     "category": "Import-Export",
     "license": "MIT",
     "doc_url": "https://github.com/yushimatenjin/galbi-sdk/tree/main/apps/blender-addon",

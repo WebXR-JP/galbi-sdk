@@ -1,6 +1,6 @@
 import type { Galbi } from "./Galbi";
 import { i18n, type Language } from "./i18n";
-import { type ModelData, storageService } from "./services/storage.service";
+import { type StoredShareSession, storageService } from "./services/storage.service";
 import type { GalbiStore } from "./store";
 import type { GalbiState } from "./types";
 
@@ -20,12 +20,12 @@ export class GalbiPopup {
 		container.appendChild(this.element);
 
 		this.store.subscribe(state => this.render(state));
-		this.loadStoredModelData().then(() => this.render(this.store.getState()));
+		this.loadStoredShareSession().then(() => this.render(this.store.getState()));
 	}
 
 	private render(state: GalbiState): void {
-		const headerIconClass = state.uploadUrl && state.isAutoUpload ? "sync-active" : "sync-inactive";
-		const syncStatus = state.uploadUrl
+		const headerIconClass = state.shareUrl && state.isAutoUpload ? "sync-active" : "sync-inactive";
+		const syncStatus = state.shareUrl
 			? state.isAutoUpload
 				? i18n.t("sync.active")
 				: i18n.t("sync.inactive")
@@ -86,8 +86,8 @@ export class GalbiPopup {
 
         <div class="galbi-url-generator">
           <div class="galbi-url-input-group">
-            <input type="text" class="galbi-url-input" value="${state.uploadUrl || ""}" placeholder="${i18n.t("upload.urlPlaceholder")}" readonly>
-            <button class="galbi-copy-button" aria-label="${i18n.t("upload.copyUrl")}" ${!state.uploadUrl ? "disabled" : ""}>
+            <input type="text" class="galbi-url-input" value="${state.shareUrl || ""}" placeholder="${i18n.t("upload.urlPlaceholder")}" readonly>
+            <button class="galbi-copy-button" aria-label="${i18n.t("upload.copyUrl")}" ${!state.shareUrl ? "disabled" : ""}>
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
               </svg>
@@ -108,15 +108,15 @@ export class GalbiPopup {
             <button class="galbi-generate-button">
               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 ${
-									state.uploadUrl
+									state.shareUrl
 										? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />'
 										: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />'
 								}
               </svg>
-              ${state.uploadUrl ? i18n.t("upload.regenerateUrl") : i18n.t("upload.generateUrl")}
+              ${state.shareUrl ? i18n.t("upload.regenerateUrl") : i18n.t("upload.generateUrl")}
             </button>
             ${
-							!state.isAutoUpload && state.uploadUrl
+							!state.isAutoUpload && state.shareUrl
 								? `
               <button class="galbi-sync-button">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,10 +148,10 @@ export class GalbiPopup {
 			this.minimize();
 		});
 
-		const exportButtonGltf = this.element.querySelector(".gltf-export");
-		exportButtonGltf?.addEventListener("click", async () => {
+		const downloadGlbButton = this.element.querySelector(".gltf-export");
+		downloadGlbButton?.addEventListener("click", async () => {
 			try {
-				await this.galbi.export("model.glb");
+				await this.galbi.downloadGlb("model.glb");
 				this.showNotification(i18n.t("export.success"), "success");
 			} catch (error) {
 				console.error("Export error:", error);
@@ -159,10 +159,10 @@ export class GalbiPopup {
 			}
 		});
 
-		const exportButtonStl = this.element.querySelector(".stl-export");
-		exportButtonStl?.addEventListener("click", async () => {
+		const downloadStlButton = this.element.querySelector(".stl-export");
+		downloadStlButton?.addEventListener("click", async () => {
 			try {
-				await this.galbi.exportStl("model.stl");
+				await this.galbi.downloadStl("model.stl");
 				this.showNotification(i18n.t("export.success"), "success");
 			} catch (error) {
 				console.error("Export error:", error);
@@ -171,7 +171,7 @@ export class GalbiPopup {
 		});
 
 		const generateButton = this.element.querySelector(".galbi-generate-button") as HTMLButtonElement | null;
-		generateButton?.addEventListener("click", () => void this.generateUrl());
+		generateButton?.addEventListener("click", () => void this.createShareUrl());
 
 		const syncButton = this.element.querySelector(".galbi-sync-button") as HTMLButtonElement | null;
 		syncButton?.addEventListener("click", async () => {
@@ -183,7 +183,7 @@ export class GalbiPopup {
 			try {
 				syncButton.disabled = true;
 				this.setLoadingState(syncButton, true);
-				const gltfData = await this.galbi.exportGltf(state.anonymousModelId);
+				const gltfData = await this.galbi.buildUploadPayload(state.anonymousModelId);
 				await this.store.uploadModel(gltfData);
 				this.showNotification(i18n.t("sync.success"), "success");
 			} catch (error) {
@@ -219,15 +219,15 @@ export class GalbiPopup {
 		const state = this.store.getState();
 		const willEnable = !state.isAutoUpload;
 
-		if (willEnable && (!state.uploadUrl || !state.anonymousModelId)) {
+		if (willEnable && (!state.shareUrl || !state.anonymousModelId)) {
 			this.showNotification(i18n.t("toggle.errorNotGenerated"), "error");
 			return;
 		}
 
 		try {
 			if (willEnable && state.anonymousModelId) {
-				const gltfData = await this.galbi.exportGltf(state.anonymousModelId);
-				this.lastSyncHash = await this.calculateHash(gltfData.data);
+				const gltfData = await this.galbi.buildUploadPayload(state.anonymousModelId);
+				this.lastSyncHash = await this.hashPayload(gltfData.data);
 				await this.store.uploadModel(gltfData);
 				this.startAutoSync();
 			} else {
@@ -303,7 +303,7 @@ export class GalbiPopup {
 		}
 	}
 
-	private async calculateHash(data: string): Promise<string> {
+	private async hashPayload(data: string): Promise<string> {
 		const encoder = new TextEncoder();
 		const buffer = encoder.encode(data);
 		const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
@@ -318,8 +318,8 @@ export class GalbiPopup {
 		}
 
 		try {
-			const gltfData = await this.galbi.exportGltf(state.anonymousModelId);
-			const currentHash = await this.calculateHash(gltfData.data);
+			const gltfData = await this.galbi.buildUploadPayload(state.anonymousModelId);
+			const currentHash = await this.hashPayload(gltfData.data);
 
 			if (currentHash === this.lastSyncHash) {
 				return;
@@ -349,7 +349,7 @@ export class GalbiPopup {
 		this.lastSyncHash = null;
 	}
 
-	private async generateUrl(): Promise<void> {
+	private async createShareUrl(): Promise<void> {
 		const generateButton = this.element.querySelector(".galbi-generate-button") as HTMLButtonElement | null;
 
 		try {
@@ -359,24 +359,24 @@ export class GalbiPopup {
 			}
 
 			this.stopAutoSync();
-			this.store.setState({ isAutoUpload: false, uploadUrl: "" });
-			this.store.clearAnonymousAccess();
-			await storageService.deleteModelData(window.location.href);
+			this.store.setState({ isAutoUpload: false, shareUrl: "" });
+			this.store.clearAnonymousSession();
+			await storageService.deleteShareSession(window.location.href);
 
 			const response = await this.store.createAnonymousModel();
 			const host = import.meta.env.VITE_BASE_URL || window.location.origin;
 			const shareUrl = response.publicUrl ? `${host}/share/${response.publicUrl}` : "";
 
-			this.store.setState({ uploadUrl: shareUrl });
+			this.store.setState({ shareUrl });
 
 			if (shareUrl && response.publicUrl) {
-				const modelData: ModelData = {
+				const modelData: StoredShareSession = {
 					modelId: response.modelId,
 					accessToken: response.accessToken,
 					expiresAt: response.expiresAt,
 					publicUrl: response.publicUrl,
 				};
-				await storageService.saveModelData(window.location.href, modelData);
+				await storageService.saveShareSession(window.location.href, modelData);
 			}
 
 			this.showNotification(i18n.t("generateUrl.success"), "success");
@@ -391,31 +391,31 @@ export class GalbiPopup {
 		}
 	}
 
-	private async loadStoredModelData(): Promise<void> {
+	private async loadStoredShareSession(): Promise<void> {
 		try {
-			const modelData = await storageService.getModelData(window.location.href);
+			const modelData = await storageService.getShareSession(window.location.href);
 			if (!modelData?.publicUrl) {
 				return;
 			}
 
 			const expiresAt = new Date(modelData.expiresAt).toISOString();
 			if (new Date(expiresAt) <= new Date()) {
-				await storageService.deleteModelData(window.location.href);
+				await storageService.deleteShareSession(window.location.href);
 				return;
 			}
 
 			const host = import.meta.env.VITE_BASE_URL || window.location.origin;
 			this.store.setState({
-				uploadUrl: `${host}/share/${modelData.publicUrl}`,
+				shareUrl: `${host}/share/${modelData.publicUrl}`,
 			});
-			this.store.setAnonymousAccess({
+			this.store.setAnonymousSession({
 				modelId: modelData.modelId,
 				accessToken: modelData.accessToken,
 				expiresAt,
 				publicUrl: modelData.publicUrl,
 			});
 		} catch (error) {
-			console.error("Stored model load error:", error);
+			console.error("Stored share session load error:", error);
 		}
 	}
 

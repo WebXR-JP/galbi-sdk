@@ -6,13 +6,13 @@ import StlExporter from "./galbi-stl-exporter";
 import { Galbi } from "./index";
 import "./styles.css";
 
-// 開発用のデモコンポーネント
+// SDK の動作確認用デモ
 function App() {
 	const canvasRef = React.useRef<HTMLCanvasElement>(null);
 
 	React.useEffect(() => {
 		if (!canvasRef.current) return;
-		// PlayCanvas setup
+		// PlayCanvas の基本セットアップ
 		const app = new pc.Application(canvasRef.current);
 		app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
 		app.setCanvasResolution(pc.RESOLUTION_AUTO);
@@ -122,14 +122,15 @@ function App() {
 		});
 
 		app.start();
-		// Initialize Galbi
+		// Galbi を PlayCanvas シーンに接続
 		const galbi = new Galbi({
 			container: document.body,
-			app: app,
-			targetEntity: app.root,
-			gltfExporter: new GltfExporter(),
-			stlExporter: new StlExporter(),
-			language: "ja",
+			rootEntity: app.root,
+			exporters: {
+				gltf: new GltfExporter(),
+				stl: new StlExporter(),
+			},
+			lang: "ja",
 		});
 		galbi.start();
 

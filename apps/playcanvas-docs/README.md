@@ -1,13 +1,13 @@
-# @repo/docs
+# @repo/playcanvas-docs
 
-Galbi のドキュメントサイトです。VitePress で構成されており、セットアップ手順、利用方法、ワールド制作向けガイドをまとめています。
+Galbi の PlayCanvas 向けドキュメントサイトです。VitePress で構成されており、セットアップ手順、利用方法、ワールド制作向けガイドをまとめています。
 
 ## 開発
 
 通常はリポジトリ root で `pnpm run dev` を実行すればまとめて確認できます。ドキュメントだけを起動したい場合は次を使います。
 
 ```bash
-pnpm -F @repo/docs dev
+pnpm -F @repo/playcanvas-docs dev
 ```
 
 開発サーバーは `http://localhost:5175` で起動します。
@@ -15,8 +15,8 @@ pnpm -F @repo/docs dev
 ## ビルドとデプロイ
 
 ```bash
-pnpm -F @repo/docs build
-pnpm -F @repo/docs deploy
+pnpm -F @repo/playcanvas-docs build
+pnpm -F @repo/playcanvas-docs deploy
 ```
 
 ## ディレクトリ構成

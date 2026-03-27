@@ -68,16 +68,18 @@ Blender Addon は現在、画像テクスチャのエクスポートには未対
 
 ## 含まれるもの
 
+`apps` には利用者が直接触る成果物を、`packages` には内部基盤や共有設定を置いています。
+
 ```text
 apps/
-  sdk/                PlayCanvas 向け Web SDK
-  docs/               ドキュメントサイト
   blender-addon/      Blender Addon
+  playcanvas-sdk/     PlayCanvas 向け Web SDK
+  playcanvas-docs/    PlayCanvas 向けドキュメントサイト
 
 packages/
   api/                Cloudflare Workers API
   database/           Cloudflare D1 / Prisma
-  tooling-config/     共有ツール設定
+  config/             共有設定
 ```
 
 ## はじめかた
@@ -101,7 +103,7 @@ pnpm install
 
 ```bash
 cp packages/api/.dev.vars.example packages/api/.dev.vars
-cp apps/sdk/.env.example apps/sdk/.env.local
+cp apps/playcanvas-sdk/.env.example apps/playcanvas-sdk/.env.local
 ```
 
 確認は基本的にこれだけです。
@@ -110,7 +112,7 @@ cp apps/sdk/.env.example apps/sdk/.env.local
 pnpm run dev
 ```
 
-これで API / Database / SDK / Docs がまとめて起動し、ローカルで動作確認できます。
+これで API / Database / PlayCanvas SDK / PlayCanvas Docs がまとめて起動し、ローカルで動作確認できます。
 
 ## PlayCanvas 向け SDK
 
@@ -139,8 +141,8 @@ python scripts/build.py
 
 ## 関連 README
 
-- [apps/sdk/README.md](./apps/sdk/README.md)
-- [apps/docs/README.md](./apps/docs/README.md)
+- [apps/playcanvas-sdk/README.md](./apps/playcanvas-sdk/README.md)
+- [apps/playcanvas-docs/README.md](./apps/playcanvas-docs/README.md)
 - [apps/blender-addon/README.md](./apps/blender-addon/README.md)
 
 ## ライセンス

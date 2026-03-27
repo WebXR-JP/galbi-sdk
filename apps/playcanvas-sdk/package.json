@@ -1,5 +1,5 @@
 {
-  "name": "@repo/sdk",
+  "name": "@repo/playcanvas-sdk",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -22,9 +22,9 @@
     "build": "vite build && pnpm build:playcanvas",
     "build:playcanvas": "node scripts/prepare-playcanvas.js",
     "preview": "vite preview",
-    "check": "biome check --config-path ../../packages/tooling-config/biome/sdk.json --write .",
-    "lint": "biome lint --config-path ../../packages/tooling-config/biome/sdk.json --write .",
-    "format": "biome format --config-path ../../packages/tooling-config/biome/sdk.json --write ."
+    "check": "biome check --config-path ../../packages/config/biome/playcanvas-sdk.json --write .",
+    "lint": "biome lint --config-path ../../packages/config/biome/playcanvas-sdk.json --write .",
+    "format": "biome format --config-path ../../packages/config/biome/playcanvas-sdk.json --write ."
   },
   "dependencies": {
     "@repo/api": "workspace:*",
@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:biome",
-    "@repo/tooling-config": "workspace:*",
+    "@repo/config": "workspace:*",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^6.0.1",

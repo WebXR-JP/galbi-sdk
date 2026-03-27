@@ -14,7 +14,7 @@ ADDON_DIR_NAME = "galbi_addon"
 INCLUDE_EXTENSIONS = {".py", ".pyd", ".so", ".dylib"}
 
 
-def build():
+def build_addon_zip():
     repo_root = Path(__file__).resolve().parent.parent
     addon_src = repo_root / ADDON_DIR_NAME
     dist_dir = repo_root / "dist"
@@ -50,4 +50,4 @@ def build():
 
 
 if __name__ == "__main__":
-    build()
+    build_addon_zip()

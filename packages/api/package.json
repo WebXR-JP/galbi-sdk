@@ -7,9 +7,9 @@
 	"scripts": {
 		"dev": "wrangler dev --port 3001",
 		"deploy": "wrangler deploy --minify",
-		"check": "biome check --config-path ../../packages/tooling-config/biome/src-only.json --write .",
-		"lint": "biome lint --config-path ../../packages/tooling-config/biome/src-only.json --write .",
-		"format": "biome format --config-path ../../packages/tooling-config/biome/src-only.json --write .",
+		"check": "biome check --config-path ../../packages/config/biome/src-only.json --write .",
+		"lint": "biome lint --config-path ../../packages/config/biome/src-only.json --write .",
+		"format": "biome format --config-path ../../packages/config/biome/src-only.json --write .",
 		"test": "vitest run --passWithNoTests",
 		"test:coverage": "vitest run --coverage --passWithNoTests"
 	},
@@ -23,7 +23,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "catalog:biome",
 		"@cloudflare/workers-types": "catalog:",
-		"@repo/tooling-config": "workspace:*",
+		"@repo/config": "workspace:*",
 		"@types/node": "^20.16.5",
 		"vitest": "catalog:",
 		"wrangler": "catalog:"

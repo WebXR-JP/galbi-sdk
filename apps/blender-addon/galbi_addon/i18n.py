@@ -1,4 +1,4 @@
-"""Internationalization support for the Galbi addon."""
+"""Internationalization support for the Galbi Blender Addon."""
 
 import bpy
 
