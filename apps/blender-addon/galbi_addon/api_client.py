@@ -24,7 +24,10 @@ class GalbiAPIClient:
         req = urllib.request.Request(
             url,
             data=data,
-            headers={"Content-Type": "application/json"},
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": "GalbiBlenderAddon/1.0",
+            },
             method="POST",
         )
 
